@@ -50,6 +50,13 @@ public class VehicleController : MonoBehaviour
     public Text debugText;
     public Text debugText2;
     private float startYpos;
+    public bool isActive;
+    private Vector2 KeyInput =>
+        new Vector2
+        {
+            x = Input.GetAxisRaw("Horizontal"),
+            y = Input.GetAxisRaw("Vertical")
+        };
 
     private void Start()
     {
@@ -60,57 +67,68 @@ public class VehicleController : MonoBehaviour
         backWheelRightTrail.emitting = false;
         startYpos = transform.position.y;
     }
-    
 
-    public void ControllVehicle(Vector2 keyInput)
+    private void Update()
     {
-        debugText.text = carRigidBody.velocity.ToString();
-        debugText2.text = engineTotalPower.ToString();
-
-        //if(Input.GetKeyDown(KeyCode.F))
-        //    ChangeSuspension();
-        
-        if (Input.GetButtonDown("Sprint"))
+        if (isActive)
         {
-            carRigidBody.AddForce(transform.forward * 1000f, ForceMode.Impulse);
+            if (Input.GetKeyDown(KeyCode.X))
+                ResetCar();
         }
-        
-        if (Input.GetButton("Sprint") && backLeft.isGrounded && backRight.isGrounded)
-        {
-            //carRigidBody.AddForce(transform.forward * 1000f);
-            currentEngineTotalPower = 2000f;
-            sprintTrail.emitting = true;
-        }
-        else
-        {
-            currentEngineTotalPower = 500f;
-            sprintTrail.emitting = false;
-        }
+    }
 
-        if (Input.GetKey(KeyCode.Space) && backLeft.isGrounded && backRight.isGrounded)
+    public void FixedUpdate()
+    {
+        if (isActive)
         {
-            currentBreakForce = breakingForce;
-            backWheelLeftTrail.emitting = true;
-            backWheelRightTrail.emitting = true;
+            debugText.text = carRigidBody.velocity.ToString();
+            debugText2.text = engineTotalPower.ToString();
+
+            //if(Input.GetKeyDown(KeyCode.F))
+            //    ChangeSuspension();
+
+            if (Input.GetButtonDown("Sprint"))
+            {
+                carRigidBody.AddForce(transform.forward * 1000f, ForceMode.Impulse);
+            }
+
+            if (Input.GetButton("Sprint") && backLeft.isGrounded && backRight.isGrounded)
+            {
+                //carRigidBody.AddForce(transform.forward * 1000f);
+                currentEngineTotalPower = 2000f;
+                sprintTrail.emitting = true;
+            }
+            else
+            {
+                currentEngineTotalPower = 500f;
+                sprintTrail.emitting = false;
+            }
+
+            if (Input.GetKey(KeyCode.Space) && backLeft.isGrounded && backRight.isGrounded)
+            {
+                currentBreakForce = breakingForce;
+                backWheelLeftTrail.emitting = true;
+                backWheelRightTrail.emitting = true;
+            }
+            else
+            {
+                currentBreakForce = 0f;
+                backWheelLeftTrail.emitting = false;
+                backWheelRightTrail.emitting = false;
+            }
+
+            engineTotalPower = currentEngineTotalPower * KeyInput.y;
+
+            AddDownForce();
+            MoveVehicle();
+            BrakeVehicle();
+            SteerVehicle();
+
+            UpdateWheel(frontLeft, frontLeftTransform);
+            UpdateWheel(frontRight, frontRightTransform);
+            UpdateWheel(backLeft, backLeftTransform);
+            UpdateWheel(backRight, backRightTransform);
         }
-        else
-        {
-            currentBreakForce = 0f;
-            backWheelLeftTrail.emitting = false;
-            backWheelRightTrail.emitting = false;
-        }
-
-        engineTotalPower = currentEngineTotalPower * keyInput.y;
-
-        AddDownForce();
-        MoveVehicle();
-        BrakeVehicle();
-        SteerVehicle(keyInput);
-
-        UpdateWheel(frontLeft, frontLeftTransform);
-        UpdateWheel(frontRight, frontRightTransform);
-        UpdateWheel(backLeft, backLeftTransform);
-        UpdateWheel(backRight, backRightTransform);
     }
 
     private void AddDownForce()
@@ -162,17 +180,17 @@ public class VehicleController : MonoBehaviour
         backLeft.brakeTorque = currentBreakForce;
     }
 
-    private void SteerVehicle(Vector2 keyInput)
+    private void SteerVehicle()
     {
         //currentTurnAngle = maxTurnAngle * GetInput().y;
         
-        if (keyInput.x > 0 ) {
-            frontLeft.steerAngle = Mathf.Rad2Deg * Mathf.Atan(3f / (5f + frontLeft.radius)) * keyInput.x;
-            frontRight.steerAngle = Mathf.Rad2Deg * Mathf.Atan(3f / (5f - frontRight.radius)) * keyInput.x;
+        if (KeyInput.x > 0 ) {
+            frontLeft.steerAngle = Mathf.Rad2Deg * Mathf.Atan(3f / (5f + frontLeft.radius)) * KeyInput.x;
+            frontRight.steerAngle = Mathf.Rad2Deg * Mathf.Atan(3f / (5f - frontRight.radius)) * KeyInput.x;
 
-        } else if (keyInput.x < 0 ) {                                                          
-            frontLeft.steerAngle = Mathf.Rad2Deg * Mathf.Atan(3f / (5f - frontLeft.radius)) * keyInput.x;
-            frontRight.steerAngle = Mathf.Rad2Deg * Mathf.Atan(3f / (5f + frontRight.radius)) * keyInput.x;
+        } else if (KeyInput.x < 0 ) {                                                          
+            frontLeft.steerAngle = Mathf.Rad2Deg * Mathf.Atan(3f / (5f - frontLeft.radius)) * KeyInput.x;
+            frontRight.steerAngle = Mathf.Rad2Deg * Mathf.Atan(3f / (5f + frontRight.radius)) * KeyInput.x;
         } else {
             frontLeft.steerAngle = 0;
             frontRight.steerAngle = 0;

@@ -22,30 +22,18 @@ public class ControllerManager : MonoBehaviour
     public VehicleController vehicleController;
     public UiNotification notification;
 
+    private float interactRadius = 2f;
     private bool inCar;
     
-    private Vector2 MouseInput =>
-        new Vector2
-        {
-            x = Input.GetAxisRaw("Mouse Y"),
-            y = Input.GetAxisRaw("Mouse X")
-        };
-
-    private Vector2 KeyInput =>
-        new Vector2
-        {
-            x = Input.GetAxisRaw("Horizontal"),
-            y = Input.GetAxisRaw("Vertical")
-        };
-
-    private float CalculateDstCharToCar()
-    {
-        return Vector3.Distance(firstPersonViewController.transform.position,
-            vehicleController.transform.position);
-    }
-
+    
     private void Start()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        
+        controllerType = ControllerType.Character;
+        
+        SetControll();
+        
         if(camera != null)
             cameraFollow = camera.GetComponent<CameraFollow>();
         
@@ -53,17 +41,54 @@ public class ControllerManager : MonoBehaviour
         camera.transform.localPosition = firstPersonViewController.cameraPosition.localPosition;
     }
 
-    private void ChangeControll()
+    private void Update()
     {
-        if (controllerType == ControllerType.Character)
-            controllerType = ControllerType.Vehicle;
+        if (CalculateDstCharToCar() < interactRadius && !inCar)
+        {
+            notification.ShowCarSeatNotification();
+        }
         else
-            controllerType = ControllerType.Character;
+        {
+            notification.HideCarSeatNotification();
+        }
+        
+        if (Input.GetKey(KeyCode.Escape) && !Application.isEditor)
+            Application.Quit();
 
-        UpdateCamera();
+        if (Input.GetKeyDown(KeyCode.F) && CalculateDstCharToCar() < interactRadius)
+        {
+            if (controllerType == ControllerType.Character)
+                controllerType = ControllerType.Vehicle;
+            else
+                controllerType = ControllerType.Character;
+
+            SetControll();
+            SetCamera();
+        }
     }
-
-    private void UpdateCamera()
+    
+    private void SetControll()
+    {
+        switch (controllerType)
+        {
+            case ControllerType.Character:
+            {
+                firstPersonViewController.isActive = true;
+                vehicleController.isActive = false;
+                ExitFromCar();
+            }
+                break;
+            case ControllerType.Vehicle:
+            {
+                firstPersonViewController.isActive = false;
+                vehicleController.isActive = true;
+                SitToCar();
+            }
+                break;
+        }
+    }
+    
+    private void SetCamera()
     {
         switch (controllerType)
         {
@@ -72,79 +97,43 @@ public class ControllerManager : MonoBehaviour
                 camera.transform.localPosition = firstPersonViewController.cameraPosition.position;
                 camera.transform.rotation = firstPersonViewController.transform.rotation;
                 camera.transform.parent = firstPersonViewController.transform;
-                
-                firstPersonViewController.transform.parent = null;
-                firstPersonViewController.transform.rotation = Quaternion.Euler(Vector3.zero);
-                firstPersonViewController.GetComponent<Rigidbody>().isKinematic = false;
-                firstPersonViewController.GetComponent<Collider>().enabled = true;
-                
                 cameraFollow.enabled = false;
-
-                inCar = false;
-            } break;
+            }
+                break;
             case ControllerType.Vehicle:
             {
                 camera.transform.parent = null;
-
-                
-                firstPersonViewController.GetComponent<Rigidbody>().isKinematic = true;
-                firstPersonViewController.GetComponent<Collider>().enabled = false;
-                firstPersonViewController.transform.parent = vehicleController.transform;
-                firstPersonViewController.transform.localPosition = vehicleController.seatPosition.localPosition;
-                firstPersonViewController.transform.rotation = vehicleController.seatPosition.rotation;
-                
                 cameraFollow.enabled = true;
-
-                inCar = true;
-            } break;
+            }
+                break;
         }
     }
 
-    private void Update()
+    private void SitToCar()
     {
-        if (CalculateDstCharToCar() < 2f && !inCar)
-        {
-            if(Input.GetKeyDown(KeyCode.F))
-                ChangeControll();
-            
-            notification.ShowCarSeatNotification();
-        }
-        else
-        {
-            notification.HideCarSeatNotification();
-        }
-
-        if(Input.GetKey(KeyCode.Escape) && !Application.isEditor)
-            Application.Quit();
+        firstPersonViewController.GetComponent<Rigidbody>().isKinematic = true;
+        firstPersonViewController.GetComponent<Collider>().enabled = false;
+        firstPersonViewController.transform.parent = vehicleController.transform;
+        firstPersonViewController.transform.localPosition = vehicleController.seatPosition.localPosition;
+        firstPersonViewController.transform.rotation = vehicleController.seatPosition.rotation;
         
-        switch (controllerType)
-        {
-            case ControllerType.Character:
-            {
-                firstPersonViewController.MouseLook(MouseInput);
-                if(Input.GetButtonDown("Jump"))
-                    firstPersonViewController.Jump();
-            } break;
-            case ControllerType.Vehicle:
-            {
-                if(Input.GetKeyDown(KeyCode.X))
-                    vehicleController.ResetCar();
-            } break;
-        }
+        inCar = true;
     }
 
-    private void FixedUpdate()
+    private void ExitFromCar()
     {
-        switch (controllerType)
-        {
-            case ControllerType.Character:
-            {
-                firstPersonViewController.CharacterControll(KeyInput);
-            } break;
-            case ControllerType.Vehicle:
-            {
-                vehicleController.ControllVehicle(KeyInput);
-            } break;
-        }
+        firstPersonViewController.transform.parent = null;
+        firstPersonViewController.transform.rotation = Quaternion.Euler(Vector3.zero);
+        firstPersonViewController.GetComponent<Rigidbody>().isKinematic = false;
+        firstPersonViewController.GetComponent<Collider>().enabled = true;
+
+        inCar = false;
+    }
+
+    
+    private float CalculateDstCharToCar()
+    {
+        return Vector3.Distance(firstPersonViewController.transform.position,
+            vehicleController.transform.position);
     }
 }

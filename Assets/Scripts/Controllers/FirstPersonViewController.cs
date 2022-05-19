@@ -35,7 +35,23 @@ public class FirstPersonViewController : MonoBehaviour
     private float lookMinX = -90f;
     private float lookMaxX = 90f;
     private bool isGrounded;
+    public bool isActive;
+    
+    private Vector2 MouseInput =>
+        new Vector2
+        {
+            x = Input.GetAxisRaw("Mouse Y"),
+            y = Input.GetAxisRaw("Mouse X")
+        };
 
+    private Vector2 KeyInput =>
+        new Vector2
+        {
+            x = Input.GetAxisRaw("Horizontal"),
+            y = Input.GetAxisRaw("Vertical")
+        };
+    
+    
     private void Start()
     {
         playerRigidbody = GetComponent<Rigidbody>();
@@ -48,26 +64,40 @@ public class FirstPersonViewController : MonoBehaviour
 
         camera.transform.localRotation = ClampRotationAroundXAxis(camera.transform.localRotation);
     }
-    
-    public void CharacterControll(Vector2 KeyInput)
+
+    private void Update()
     {
-        GroundCheck();
-        
-        if (!Input.anyKey)
-            return;
-
-        if ((Mathf.Abs(KeyInput.x) > float.Epsilon) || (Mathf.Abs(KeyInput.y) > float.Epsilon))
+        if (isActive)
         {
-            UpdateCurrentSpeed(KeyInput);
-            Vector3 moveAmount = ((transform.forward * KeyInput.y) + (transform.right * KeyInput.x)) * currentSpeed * Time.fixedDeltaTime;
+            MouseLook(MouseInput);
+            if (Input.GetButtonDown("Jump"))
+                Jump();
+        }
+    }
 
-            float normalisedSlope = (slopeAngle / 90f) * -1f;
-            debugText2.text = normalisedSlope.ToString();
+    private void FixedUpdate()
+    {
+        if (isActive)
+        {
+            GroundCheck();
 
-            moveAmount += (moveAmount * normalisedSlope);
-            
-            Move(moveAmount);
-            
+            if (!Input.anyKey)
+                return;
+
+            if ((Mathf.Abs(KeyInput.x) > float.Epsilon) || (Mathf.Abs(KeyInput.y) > float.Epsilon))
+            {
+                UpdateCurrentSpeed(KeyInput);
+                Vector3 moveAmount = ((transform.forward * KeyInput.y) + (transform.right * KeyInput.x)) *
+                                     currentSpeed * Time.fixedDeltaTime;
+
+                float normalisedSlope = (slopeAngle / 90f) * -1f;
+                debugText2.text = normalisedSlope.ToString();
+
+                moveAmount += (moveAmount * normalisedSlope);
+
+                Move(moveAmount);
+
+            }
         }
     }
 
