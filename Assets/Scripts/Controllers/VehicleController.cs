@@ -123,12 +123,12 @@ public class VehicleController : MonoBehaviour
             MoveVehicle();
             BrakeVehicle();
             SteerVehicle();
-
-            UpdateWheel(frontLeft, frontLeftTransform);
-            UpdateWheel(frontRight, frontRightTransform);
-            UpdateWheel(backLeft, backLeftTransform);
-            UpdateWheel(backRight, backRightTransform);
         }
+        
+        UpdateWheel(frontLeft, frontLeftTransform);
+        UpdateWheel(frontRight, frontRightTransform);
+        UpdateWheel(backLeft, backLeftTransform);
+        UpdateWheel(backRight, backRightTransform);
     }
 
     private void AddDownForce()

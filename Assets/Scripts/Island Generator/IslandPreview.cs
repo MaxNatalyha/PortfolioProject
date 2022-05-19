@@ -14,24 +14,29 @@ public class IslandPreview : MonoBehaviour
         ColourMapChunks,
         FalloffMapChunks
     }
+    
     public PreviewMode previewMode;
     
+    [Header("Preview Refs")]
     public Renderer textureRender;
     public MeshFilter meshFilter;
+    public TreesGenerator treesGenerator;
     
-    
+    [Header("Settings")]
     public MeshSettings meshSettings;
     public HeightMapSettings heightMapSettings;
     public TextureData textureData;
+    
+    [Header("Materials")]
     public Material terrainMaterial;
     public Material previewMaterial;
+    
+    [Header("Other")]
     [Range(0, MeshSettings.numSupportedLODSs - 1)]
     public int editorPreviewLOD;
     public bool autoUpdate;
-
     public List<GameObject> previewPlanes = new List<GameObject>();
-    private int planesIndex;
-
+    
     public void ClearPreviewPlanes()
     {
         if (previewPlanes != null)
@@ -76,6 +81,9 @@ public class IslandPreview : MonoBehaviour
         else if (previewMode == PreviewMode.FalloffMap)
             DrawTexture(TextureGenerator.TextureFromFalloffMap(FalloffGenerator.GenerateFallofMap(meshSettings.numVertsPerLine, heightMapSettings, heightMapSettings.falloffSize, heightMapSettings.falloffXoffset,heightMapSettings.falloffYoffset)));
 
+        
+        treesGenerator.GenerateTrees(heightMap, textureData);
+        
     }
 
     private Color[] CreateColourMap(HeightMap heightMap, int mapSize)
