@@ -1,0 +1,82 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4539deca5b8c7e1499a3fd593fd92012, type: 3}
+  m_Name: Island HeightMap Default
+  m_EditorClassIdentifier: 
+  autoUpdate: 1
+  noiseSettings:
+    normalizeMode: 1
+    scale: 125
+    octaves: 6
+    persistance: 0.463
+    lacunarity: 2
+    seed: 5
+    offset: {x: 0, y: 0}
+  heightMultiplayer: 200
+  heightCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1.7211195
+      outSlope: 1.7211195
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.10165968
+    - serializedVersion: 3
+      time: 0.39183134
+      value: 0.3611416
+      inSlope: 0.09292409
+      outSlope: 0.09292409
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.19935474
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.7267785
+      value: 0.36877087
+      inSlope: 1.8636819
+      outSlope: 1.8636819
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.05896256
+      outWeight: 0.12261193
+    - serializedVersion: 3
+      time: 0.9346278
+      value: 0.82771593
+      inSlope: 2.860711
+      outSlope: 2.860711
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.17140637
+      outWeight: 0.21387334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.5141745
+      outSlope: 1.5141745
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.6139457
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  useFalloff: 1
+  a: 3
+  b: 6
+  falloffXoffset: 0
+  falloffYoffset: 0
+  falloffSize: 1
+  falloffMultiplier: 0

@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 975b3342d207f5a428d6f06610021246, type: 3}
+  m_Name: Island Textures Default 1
+  m_EditorClassIdentifier: 
+  autoUpdate: 0
+  layers:
+  - texture: {fileID: 2800000, guid: cdab783b19b5834429521c2ca38ceb9d, type: 3}
+    tint: {r: 0, g: 0.4149428, b: 0.6981132, a: 0}
+    tintStrength: 0
+    startHeight: 0
+    blendStrength: 0
+    textureScale: 15
+  - texture: {fileID: 2800000, guid: b5a739cf6be0c674f8b5c282277c7e52, type: 3}
+    tint: {r: 1, g: 1, b: 1, a: 0}
+    tintStrength: 0
+    startHeight: 0.078
+    blendStrength: 0
+    textureScale: 15
+  - texture: {fileID: 2800000, guid: c3306467e7d9ff94b9d9d9779f317198, type: 3}
+    tint: {r: 0, g: 0, b: 0, a: 0}
+    tintStrength: 0
+    startHeight: 0.1
+    blendStrength: 0
+    textureScale: 15
