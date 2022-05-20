@@ -5,44 +5,84 @@ using UnityEngine;
 
 public class TreesGenerator : MonoBehaviour
 {
-    public List<Vector2> TreesPos = new List<Vector2>();
+    public List<Vector3> TreesPosiblePosition = new List<Vector3>();
+    public HeightMapSettings noiseSettings;
+    public float innerThreshold;
+    public float outerThreshold;
+    public Color previewColor;
+    
     private float minGrow;
     private float maxGrow;
+    private int mapLength;
+    private float[,] noiseTreesMap;
     
-    public void GenerateTrees(HeightMap heightMap, TextureData textureData)
+    public void GenerateTrees(HeightMap heightMap, TextureData textureData, MeshSettings meshSettings)
     {
-        TreesPos.Clear();
+        TreesPosiblePosition.Clear();
+
+        mapLength = heightMap.values.GetLength(0);
+
+        noiseTreesMap = Noise.GenerateNoiseMap(mapLength, mapLength, noiseSettings.noiseSettings, Vector2.zero);
+        Debug.Log(noiseTreesMap[25,25]);
         
-        minGrow = Mathf.Lerp(heightMap.minValue, heightMap.maxValue,textureData.layers[2].startHeight);
-        maxGrow = Mathf.Lerp(heightMap.minValue, heightMap.maxValue,textureData.layers[3].startHeight);
+        int borderedSize = heightMap.values.GetLength(0);
+        int meshSize = borderedSize - 2*1;
+        int meshSizeUnsimplified = borderedSize - 2;
+        
+        float topLeftX = (meshSizeUnsimplified - 1) / -2f;
+        float topLeftZ = (meshSizeUnsimplified - 1) / 2f;
+        
+        minGrow = Mathf.Lerp(0f, textureData.globalHeight,textureData.layers[2].startHeight) + outerThreshold;
+        maxGrow = Mathf.Lerp(0f, textureData.globalHeight,textureData.layers[3].startHeight) - innerThreshold;
 
         for (int x = 0; x < heightMap.values.GetLength(0); x++)
         {
             for (int y = 0; y < heightMap.values.GetLength(1); y++)
             {
-                if(heightMap.values[x,y] > minGrow && heightMap.values[x,y] < maxGrow)
-                    TreesPos.Add(new Vector2(x,y));
+                if (heightMap.values[x, y] > minGrow && heightMap.values[x, y] < maxGrow && noiseTreesMap[x,y] > .5f)
+                {
+                    Vector2 percent = new Vector2((x - 1) / (float)meshSize, (y - 1) / (float)meshSize);
+                    
+                    Vector3 treePosition = new Vector3((topLeftX + percent.x * meshSizeUnsimplified) * meshSettings.meshScale, heightMap.values[x,y], (topLeftZ - percent.y * meshSizeUnsimplified) * meshSettings.meshScale); 
+
+                    TreesPosiblePosition.Add(treePosition);
+                }
+                
             }
         }
         
-        Debug.Log(minGrow);
-        Debug.Log(maxGrow);
-        //Debug.Log(heightMap.values[heightMap.values.Length/2,heightMap.values.Length/2]);
-        Debug.Log(heightMap.minValue);
-        Debug.Log(heightMap.maxValue);
-
-
+        Debug.Log("Min grow: " + minGrow);
+        Debug.Log("Max grow: " + maxGrow);
     }
 
     public void OnDrawGizmos()
     {
-        if (TreesPos != null)
+        /*
+        for (int x = 0; x < mapLength; x++)
         {
-            Gizmos.color = Color.green;
-            foreach (var tree in TreesPos)
+            for (int y = 0; y < mapLength; y++)
             {
-                Gizmos.DrawSphere(new Vector3(tree.x, 50f, tree.y), 2f);
+                if (noiseTreesMap[x, y] > .5f)
+                {
+                    Gizmos.color = Color.blue;
+                }
+                else
+                {
+                    Gizmos.color = Color.green;
+                }
+                Gizmos.DrawWireCube(new Vector3(x, 50f, y), new Vector3(1f,3f,1f));
             }
         }
+        */
+        
+        if (TreesPosiblePosition != null)
+        {
+            Gizmos.color = previewColor;
+            foreach (var treePosition in TreesPosiblePosition)
+            {
+                Gizmos.DrawCube(new Vector3(treePosition.x, treePosition.y + 1.5f, treePosition.z), new Vector3(2f,3f,2f));
+            }
+        }
+        
     }
 }

@@ -82,7 +82,7 @@ public class IslandPreview : MonoBehaviour
             DrawTexture(TextureGenerator.TextureFromFalloffMap(FalloffGenerator.GenerateFallofMap(meshSettings.numVertsPerLine, heightMapSettings, heightMapSettings.falloffSize, heightMapSettings.falloffXoffset,heightMapSettings.falloffYoffset)));
 
         
-        treesGenerator.GenerateTrees(heightMap, textureData);
+        treesGenerator.GenerateTrees(heightMap, textureData, meshSettings);
         
     }
 
