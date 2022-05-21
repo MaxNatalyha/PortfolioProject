@@ -20,7 +20,7 @@ public class IslandPreview : MonoBehaviour
     [Header("Preview Refs")]
     public Renderer textureRender;
     public MeshFilter meshFilter;
-    public TreesGenerator treesGenerator;
+    public Scatter scatter;
     
     [Header("Settings")]
     public MeshSettings meshSettings;
@@ -35,6 +35,7 @@ public class IslandPreview : MonoBehaviour
     [Range(0, MeshSettings.numSupportedLODSs - 1)]
     public int editorPreviewLOD;
     public bool autoUpdate;
+    public bool treesPreview;
     public List<GameObject> previewPlanes = new List<GameObject>();
     
     public void ClearPreviewPlanes()
@@ -81,8 +82,16 @@ public class IslandPreview : MonoBehaviour
         else if (previewMode == PreviewMode.FalloffMap)
             DrawTexture(TextureGenerator.TextureFromFalloffMap(FalloffGenerator.GenerateFallofMap(meshSettings.numVertsPerLine, heightMapSettings, heightMapSettings.falloffSize, heightMapSettings.falloffXoffset,heightMapSettings.falloffYoffset)));
 
-        
-        treesGenerator.GenerateTrees(heightMap, textureData, meshSettings);
+        /*
+        if (treesPreview)
+        {
+            treesGenerator.GenerateTrees(heightMap, textureData, meshSettings);
+        }
+        else
+        {
+            treesGenerator.ClearTreesPosition();
+        }
+        */
         
     }
 
@@ -210,5 +219,4 @@ public class IslandPreview : MonoBehaviour
         }
         
     }
-    
 }

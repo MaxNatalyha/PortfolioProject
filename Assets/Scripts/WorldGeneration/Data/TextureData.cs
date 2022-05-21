@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+public enum LayerTypes
+{
+    Water,
+    Sand,
+    Grass,
+    Cliffs
+};
+
 [CreateAssetMenu(menuName = "World Generation/Texture Data")]
 public class TextureData : UpdatableData
 {
@@ -63,6 +71,7 @@ public class TextureData : UpdatableData
         [Range(0, 1)] public float startHeight;
         [Range(0, 1)] public float blendStrength;
         public float textureScale;
+        public LayerTypes layerType;
 
     }
 }
