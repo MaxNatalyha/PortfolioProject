@@ -95,6 +95,14 @@ public class IslandPreview : MonoBehaviour
         
     }
 
+    public void ScatterPreview()
+    {
+        HeightMap heightMap = HeightMapGenerator.GenerateHeightMap(meshSettings.numVertsPerLine,
+            meshSettings.numVertsPerLine, heightMapSettings, Vector2.zero, meshSettings, true);
+        
+        scatter.CalculatePreviewSpawnPosition(heightMap, textureData, meshSettings, LayerTypes.Grass);
+    }
+
     private Color[] CreateColourMap(HeightMap heightMap, int mapSize)
     {
         Color[] colourMap = new Color[mapSize * mapSize];

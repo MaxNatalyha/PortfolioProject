@@ -26,8 +26,16 @@ public class Scatter : MonoBehaviour
     
     [Header("Preview")]
     public Color previewColor;
+    public List<Vector3> previewPossiblePositions = new List<Vector3>();
 
-    
+    public void CalculatePreviewSpawnPosition(HeightMap heightMap, TextureData textureData, MeshSettings meshSettings, LayerTypes currentType)
+    {
+        if(previewPossiblePositions!=null)
+            previewPossiblePositions.Clear();
+        
+        previewPossiblePositions = CalculatePossibleSpawnPosition(heightMap, textureData, meshSettings, currentType);
+    }
+
     public List<Vector3> CalculatePossibleSpawnPosition(HeightMap heightMap, TextureData textureData, MeshSettings meshSettings, LayerTypes currentType)
     {
         List<Vector3> TreesPosiblePosition = new List<Vector3>();

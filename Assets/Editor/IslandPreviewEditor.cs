@@ -22,5 +22,12 @@ public class IslandPreviewEditor : Editor
         {
             islandPreview.DrawMapInEditor();
         }
+        
+        /*
+        if (GUILayout.Button("Scatter Preview"))
+        {
+            islandPreview.ScatterPreview();
+        }
+        */
     }
 }
