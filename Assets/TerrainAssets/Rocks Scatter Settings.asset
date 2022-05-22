@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d937baec9702344594527a6595d6c9f, type: 3}
+  m_Name: Rocks Scatter Settings
+  m_EditorClassIdentifier: 
+  scatterHolderName: Rocks Holder
+  noiseSettings:
+    normalizeMode: 0
+    scale: 75
+    octaves: 6
+    persistance: 1
+    lacunarity: 4
+    seed: 0
+    offset: {x: 0, y: 0}
+  spawnObjectsPref:
+  - {fileID: 520862596293039392, guid: 97a11819683447b498aa141d9c30351b, type: 3}
+  startLayer: 2
+  endLayer: 5
+  inclusiveLastLayer: 1
+  positionOffset: 0
+  scaleRange: 0.5
+  innerThreshold: 0
+  outerThreshold: 0
+  density: 0.378
+  noiseStrength: 0.584
+  previewColor: {r: 1, g: 0.41492444, b: 0, a: 1}
+  previewBoxSize: {x: 2, y: 2, z: 2}

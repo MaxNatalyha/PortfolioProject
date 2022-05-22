@@ -8,12 +8,13 @@ public class IslandGenerator : MonoBehaviour
 {
     public Material mapMaterial;
     public IslandPreview islandPreview;
+    public SpawnScatterObjects spawnScatterObjects;
 
     [Header("Settings Objects")]
     public MeshSettings meshSettings;
     public HeightMapSettings heightMapSettings;
     public TextureData textureSettings;
-    
+
     [Header("Prefabs")]
     public GameObject underwaterGO;
     public GameObject waterGO;
@@ -36,6 +37,7 @@ public class IslandGenerator : MonoBehaviour
         textureSettings.ApplyToMaterial(mapMaterial);
         textureSettings.UpdateMeshHeights(mapMaterial, heightMapSettings.minHeight, heightMapSettings.maxHeight);
         
+        
         for (int x = -2; x < 3; x++)
         {
             for (int y = -2; y < 3; y++)
@@ -45,10 +47,11 @@ public class IslandGenerator : MonoBehaviour
                 else
                 {
                     IslandChunk islandChunk = new IslandChunk(new Vector2(x, y), islandChunksHolder, heightMapSettings,
-                        meshSettings, mapMaterial);
+                        meshSettings, mapMaterial, spawnScatterObjects, textureSettings);
                 }
             }
         }
+        
         
         CreateWaterSurface();
         
@@ -91,31 +94,33 @@ public class IslandChunk
     private HeightMapSettings heightMapSettings;
     private MeshSettings meshSettings;
     
-    public IslandChunk(Vector2 coord, Transform parent, HeightMapSettings heightMapSettings, MeshSettings meshSettings, Material material)
+    public IslandChunk(Vector2 coord, Transform parent, HeightMapSettings heightMapSettings, MeshSettings meshSettings, Material material, SpawnScatterObjects spawnScatterObjects, TextureData textureData)
     {
         this.coord = coord;
         this.heightMapSettings = heightMapSettings;
         this.meshSettings = meshSettings;
-
+        
         sampleCentre = coord * meshSettings.meshWorldSize / meshSettings.meshScale;
         Vector2 position = coord * meshSettings.meshWorldSize;
-         
-        meshObject = new GameObject("Island Chunk" + position);
+        
+        heightMap = HeightMapGenerator.GenerateHeightMap(meshSettings.numVertsPerLine, meshSettings.numVertsPerLine, heightMapSettings, sampleCentre, meshSettings, false);
 
+        meshObject = new GameObject("Island Chunk" + position);
         meshRenderer = meshObject.AddComponent<MeshRenderer>();
         meshFilter = meshObject.AddComponent<MeshFilter>();
         meshCollider = meshObject.AddComponent<MeshCollider>();
-        
         meshRenderer.material = material;
+        
+        spawnScatterObjects.SpawnScatter(heightMap, textureData, meshSettings, sampleCentre, meshObject.transform);
 
         meshObject.transform.position = new Vector3(position.x, 0f, position.y);
         meshObject.transform.parent = parent;
         
         
-        heightMap = HeightMapGenerator.GenerateHeightMap(meshSettings.numVertsPerLine, meshSettings.numVertsPerLine, heightMapSettings, sampleCentre, meshSettings, false);
         MeshData meshData = MeshGenerator.GenerateTerrainMesh(heightMap.values, meshSettings, 0);
         meshFilter.mesh = meshData.CreateMesh();
         meshCollider.sharedMesh = meshFilter.mesh;
+        
     }
     
     public void Load()

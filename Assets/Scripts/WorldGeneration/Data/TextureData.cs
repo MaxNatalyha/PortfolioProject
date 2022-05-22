@@ -3,13 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public enum LayerTypes
-{
-    Water,
-    Sand,
-    Grass,
-    Cliffs
-};
 
 [CreateAssetMenu(menuName = "World Generation/Texture Data")]
 public class TextureData : UpdatableData

@@ -4,44 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class Scatter : MonoBehaviour
+public static class Scatter
 {
-    [Header("Noise Map settings")]
-    public HeightMapSettings noiseSettings;
-
-    [Header("Trees prefabs")] 
-    public GameObject[] spawnObjectsPref;
-
-    [Header("Generate Adjusting")] 
-    [Range(0, 1)]
-    public float positionOffset;
-    [Range(0,.5f)]
-    public float scaleRange;
-    public float innerThreshold;
-    public float outerThreshold;
-    [Range(0,1)]
-    public float density;
-    [Range(0,1)]
-    public float noiseStrength;
-    
-    [Header("Preview")]
-    public Color previewColor;
-    public List<Vector3> previewPossiblePositions = new List<Vector3>();
-
-    public void CalculatePreviewSpawnPosition(HeightMap heightMap, TextureData textureData, MeshSettings meshSettings, LayerTypes currentType)
+    public static List<Vector3> CalculatePossibleSpawnPosition(HeightMap heightMap, TextureData textureData, MeshSettings meshSettings, ScatterSettings scatterSettings, Vector2 sampleCenter)
     {
-        if(previewPossiblePositions!=null)
-            previewPossiblePositions.Clear();
-        
-        previewPossiblePositions = CalculatePossibleSpawnPosition(heightMap, textureData, meshSettings, currentType);
-    }
-
-    public List<Vector3> CalculatePossibleSpawnPosition(HeightMap heightMap, TextureData textureData, MeshSettings meshSettings, LayerTypes currentType)
-    {
-        List<Vector3> TreesPosiblePosition = new List<Vector3>();
+        List<Vector3> PossiblePositions = new List<Vector3>();
         
         int mapLength = heightMap.values.GetLength(0);
-        float[,] noiseTreesMap = Noise.GenerateNoiseMap(mapLength, mapLength, noiseSettings.noiseSettings, Vector2.zero);
+        float[,] noiseTreesMap = Noise.GenerateNoiseMap(mapLength, mapLength, scatterSettings.noiseSettings, sampleCenter);
 
         float minGrow = 0f;
         float maxGrow = 0f;
@@ -53,64 +23,42 @@ public class Scatter : MonoBehaviour
         float topLeftX = (meshSizeUnsimplified - 1) / -2f;
         float topLeftZ = (meshSizeUnsimplified - 1) / 2f;
 
-        for (int i = 0; i < textureData.layers.Length-1; i++)
+        for (int i = 0; i < textureData.layers.Length; i++)
         {
-            if (currentType == textureData.layers[i].layerType)
+            if (textureData.layers[i].layerType == scatterSettings.startLayer)
             {
-                minGrow = Mathf.Lerp(0f, textureData.globalHeight,textureData.layers[i].startHeight) + outerThreshold;
-                maxGrow = Mathf.Lerp(0f, textureData.globalHeight,textureData.layers[i+1].startHeight) - innerThreshold;
+                minGrow = Mathf.Lerp(0f, textureData.globalHeight, textureData.layers[i].startHeight) + scatterSettings.outerThreshold;
+            }
+            
+            if (textureData.layers[i].layerType == scatterSettings.endLayer)
+            {
+                maxGrow = Mathf.Lerp(0f, textureData.globalHeight,textureData.layers[i].startHeight) - scatterSettings.innerThreshold;
+                
+                if(scatterSettings.inclusiveLastLayer)
+                    maxGrow = Mathf.Lerp(0f, textureData.globalHeight,1);
             }
         }
 
-        for (int x = 0; x < heightMap.values.GetLength(0); x++)
+        for (int x = 0; x < borderedSize; x++)
         {
-            for (int y = 0; y < heightMap.values.GetLength(1); y++)
+            for (int y = 0; y < borderedSize; y++)
             {
-                if (heightMap.values[x, y] > minGrow && heightMap.values[x, y] < maxGrow && noiseTreesMap[x,y] > noiseStrength && RandomDensity())
+                if (heightMap.values[x, y] > minGrow && heightMap.values[x, y] < maxGrow && noiseTreesMap[x,y] > scatterSettings.noiseStrength && RandomDensity(scatterSettings.density))
                 {
                     Vector2 percent = new Vector2((x - 1) / (float)meshSize, (y - 1) / (float)meshSize);
                     
-                    Vector3 treePosition = new Vector3((topLeftX + percent.x * meshSizeUnsimplified) * meshSettings.meshScale, heightMap.values[x,y], (topLeftZ - percent.y * meshSizeUnsimplified) * meshSettings.meshScale); 
-                    TreesPosiblePosition.Add(treePosition);
+                    Vector3 position = new Vector3((topLeftX + percent.x * meshSizeUnsimplified) * meshSettings.meshScale, heightMap.values[x,y], (topLeftZ - percent.y * meshSizeUnsimplified) * meshSettings.meshScale); 
+                    PossiblePositions.Add(position);
                 }
                 
             }
         }
-        return TreesPosiblePosition;
+        return PossiblePositions;
     }
-
-    public void SpawnObjects(List<Vector3> spawnPositions, GameObject[] spawnObjects)
-    {
-        GameObject treesHolder = new GameObject();
-        treesHolder.name = "Trees Holder";
-        
-        foreach (var spawnPosition in spawnPositions)
-        {
-            GameObject Tree = Instantiate(spawnObjectsPref[Random.Range(0, spawnObjectsPref.Length-1)], spawnPosition, Quaternion.AngleAxis(Random.Range(0, 360), Vector3.up));
-            float rndScale = Random.Range(1-scaleRange, 1+scaleRange);
-            Tree.transform.localScale = new Vector3(rndScale, rndScale, rndScale);
-            Tree.transform.parent = treesHolder.transform;
-        }
-    }
-
-    private bool RandomDensity()
+    
+    private static bool RandomDensity(float density)
     {
         float random = Random.Range(0f, 1f);
         return random < density;
-    }
-
-    public void OnDrawGizmos()
-    {
-        /*
-        
-        if (TreesPosiblePosition != null)
-        {
-            Gizmos.color = previewColor;
-            foreach (var treePosition in TreesPosiblePosition)
-            {
-                Gizmos.DrawCube(new Vector3(treePosition.x, treePosition.y + 4f, treePosition.z), new Vector3(2f,8f,2f));
-            }
-        }
-        */
     }
 }

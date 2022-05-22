@@ -20,7 +20,6 @@ public class IslandPreview : MonoBehaviour
     [Header("Preview Refs")]
     public Renderer textureRender;
     public MeshFilter meshFilter;
-    public Scatter scatter;
     
     [Header("Settings")]
     public MeshSettings meshSettings;
@@ -35,8 +34,7 @@ public class IslandPreview : MonoBehaviour
     [Range(0, MeshSettings.numSupportedLODSs - 1)]
     public int editorPreviewLOD;
     public bool autoUpdate;
-    public bool treesPreview;
-    public List<GameObject> previewPlanes = new List<GameObject>();
+    private List<GameObject> previewPlanes = new List<GameObject>();
     
     public void ClearPreviewPlanes()
     {
@@ -82,27 +80,8 @@ public class IslandPreview : MonoBehaviour
         else if (previewMode == PreviewMode.FalloffMap)
             DrawTexture(TextureGenerator.TextureFromFalloffMap(FalloffGenerator.GenerateFallofMap(meshSettings.numVertsPerLine, heightMapSettings, heightMapSettings.falloffSize, heightMapSettings.falloffXoffset,heightMapSettings.falloffYoffset)));
 
-        /*
-        if (treesPreview)
-        {
-            treesGenerator.GenerateTrees(heightMap, textureData, meshSettings);
-        }
-        else
-        {
-            treesGenerator.ClearTreesPosition();
-        }
-        */
-        
     }
-
-    public void ScatterPreview()
-    {
-        HeightMap heightMap = HeightMapGenerator.GenerateHeightMap(meshSettings.numVertsPerLine,
-            meshSettings.numVertsPerLine, heightMapSettings, Vector2.zero, meshSettings, true);
-        
-        scatter.CalculatePreviewSpawnPosition(heightMap, textureData, meshSettings, LayerTypes.Grass);
-    }
-
+    
     private Color[] CreateColourMap(HeightMap heightMap, int mapSize)
     {
         Color[] colourMap = new Color[mapSize * mapSize];
