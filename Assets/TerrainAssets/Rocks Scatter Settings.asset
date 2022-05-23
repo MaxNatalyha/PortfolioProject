@@ -24,8 +24,8 @@ MonoBehaviour:
   spawnObjectsPref:
   - {fileID: 520862596293039392, guid: 97a11819683447b498aa141d9c30351b, type: 3}
   startLayer: 2
-  endLayer: 5
-  inclusiveLastLayer: 1
+  endLayer: 4
+  inclusiveLastLayer: 0
   positionOffset: 0
   scaleRange: 0.5
   innerThreshold: 0

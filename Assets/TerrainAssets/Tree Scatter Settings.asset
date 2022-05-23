@@ -25,7 +25,7 @@ MonoBehaviour:
   - {fileID: 8978255178400166690, guid: 598ee80cebedf634992f0f9c5345203b, type: 3}
   - {fileID: 477864399549054454, guid: 08b501a3a0d0ec1428d4165f564f5ec9, type: 3}
   startLayer: 2
-  endLayer: 5
+  endLayer: 3
   inclusiveLastLayer: 0
   positionOffset: 0
   scaleRange: 0.25
