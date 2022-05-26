@@ -43,9 +43,12 @@ public class ControllerManager : MonoBehaviour
 
     private void Update()
     {
+        if(Input.GetKeyDown(KeyCode.E))
+            HUDEvents.current.OpenInventory();
+        
         if (CalculateDstCharToCar() < interactRadius && !inCar)
         {
-            notification.ShowCarSeatNotification();
+            notification.ShowCarSeatNotification("Press F to pay respect");
         }
         else
         {

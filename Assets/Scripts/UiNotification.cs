@@ -8,10 +8,10 @@ public class UiNotification : MonoBehaviour
     public RectTransform notifTrans;
     public Text notifText;
 
-    public void ShowCarSeatNotification()
+    public void ShowCarSeatNotification(string text)
     {
         notifTrans.gameObject.SetActive(true);
-        notifText.text = "Press F to pay respect";
+        notifText.text = text;
     }
     
     public void HideCarSeatNotification()
