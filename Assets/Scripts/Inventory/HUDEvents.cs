@@ -18,4 +18,7 @@ public class HUDEvents : MonoBehaviour
         if (onOpenInventory != null)
             onOpenInventory();
     }
+
+    public Action<Item> onAddingItem;
+
 }

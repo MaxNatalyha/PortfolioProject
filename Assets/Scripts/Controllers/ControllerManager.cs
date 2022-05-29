@@ -24,6 +24,8 @@ public class ControllerManager : MonoBehaviour
 
     private float interactRadius = 2f;
     private bool inCar;
+
+    public Item item;
     
     
     private void Start()
@@ -54,7 +56,13 @@ public class ControllerManager : MonoBehaviour
         {
             notification.HideCarSeatNotification();
         }
-        
+
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            item.count = 150;
+            HUDEvents.current.onAddingItem?.Invoke(item);
+        }
+
         if (Input.GetKey(KeyCode.Escape) && !Application.isEditor)
             Application.Quit();
 
