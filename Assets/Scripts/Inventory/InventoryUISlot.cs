@@ -6,19 +6,27 @@ using UnityEngine.UI;
 
 public class InventoryUISlot : MonoBehaviour
 {
-    private Image icon;
-    private Text count;
+    public Image icon;
+    public Text count;
 
-    private void Awake()
+    private void Start()
     {
-        icon = GetComponentInChildren<Image>();
-        count = GetComponentInChildren<Text>();
+        RemoveItem();
     }
 
     public void AddItem(Item item)
     {
         count.text = item.count.ToString();
         icon.sprite = item.icon;
+        icon.enabled = true;
+        count.enabled = true;
+
+    }
+
+    public void RemoveItem()
+    {
+        count.enabled = false;
+        icon.enabled = false;
     }
     
 }

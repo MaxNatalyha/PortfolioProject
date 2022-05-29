@@ -7,15 +7,15 @@ public class InventoryUI : MonoBehaviour
 {
     public InventoryUISlot[] inventorySlots;
     public RectTransform UISlotPref;
-    private int _slotCount = 28;
+    //private int _slotCount;
     private RectTransform _slotHolder;
 
-    public void Start()
+    public void Init(int slotsCount)
     {
-        inventorySlots = new InventoryUISlot[_slotCount];
+        inventorySlots = new InventoryUISlot[slotsCount];
         _slotHolder = GetComponent<RectTransform>();
 
-        for (int i = 0; i < _slotCount; i++)
+        for (int i = 0; i < slotsCount; i++)
         {
             RectTransform slot = Instantiate(UISlotPref, _slotHolder);
             

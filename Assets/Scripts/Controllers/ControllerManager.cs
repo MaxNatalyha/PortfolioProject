@@ -27,7 +27,6 @@ public class ControllerManager : MonoBehaviour
 
     public Item item;
     
-    
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
