@@ -2,31 +2,59 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class InventoryUISlot : MonoBehaviour
+public class InventoryUISlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IDropHandler
 {
-    public Image icon;
-    public Text count;
+    private Image _slotImage;
+    
+    [HideInInspector]
+    public UIItem _uiItem;
+    
+    private Color _mainColor;
+    private Color _hoverColor;
 
-    private void Start()
+    public void Init(Color mainColor, Color hoverColor)
     {
-        RemoveItem();
+        _slotImage = GetComponent<Image>();
+        
+        _mainColor = mainColor;
+        _hoverColor = hoverColor;
+        _slotImage.color = _mainColor;
     }
 
-    public void AddItem(Item item)
+    public void CreateItemUI(Item item, RectTransform prefab)
     {
-        count.text = item.count.ToString();
-        icon.sprite = item.icon;
-        icon.enabled = true;
-        count.enabled = true;
+        RectTransform newUiItemRect = Instantiate(prefab, GetComponent<RectTransform>());
+        newUiItemRect.name = item.itemType.ToString();
+        
+        UIItem newUiItem = newUiItemRect.GetComponent<UIItem>();
+        newUiItem.SetItem(item);
 
+        _uiItem = newUiItem;
     }
 
-    public void RemoveItem()
+    public void OnPointerEnter(PointerEventData eventData)
     {
-        count.enabled = false;
-        icon.enabled = false;
+        _slotImage.color = _hoverColor;
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        _slotImage.color = _mainColor;
     }
     
+    public void OnDrop(PointerEventData eventData)
+    {
+        if (_uiItem == null)
+        {
+            var otherItemTransform = eventData.pointerDrag.transform;
+            otherItemTransform.GetComponent<UIItem>().RemoveFromSlot();
+            otherItemTransform.SetParent(transform);
+            _uiItem = otherItemTransform.GetComponent<UIItem>();
+            
+            Debug.Log(otherItemTransform.name);
+        }
+    }
 }

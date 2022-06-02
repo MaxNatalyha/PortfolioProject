@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Inventory))]
 public class FirstPersonViewController : MonoBehaviour
 {
     [Header("Speed Settings")]
@@ -30,12 +31,15 @@ public class FirstPersonViewController : MonoBehaviour
 
     private Rigidbody playerRigidbody;
 
-    private float currentSpeed = 0f;
-    private float slopeAngle;
-    private float lookMinX = -90f;
-    private float lookMaxX = 90f;
-    private bool isGrounded;
+    private float _currentSpeed = 0f;
+    private float _slopeAngle;
+    private float _lookMinX = -90f;
+    private float _lookMaxX = 90f;
+    private bool _isGrounded;
+    private Inventory inventory;
+    
     public bool isActive;
+    public bool mouseLock = true;
     
     private Vector2 MouseInput =>
         new Vector2
@@ -55,21 +59,15 @@ public class FirstPersonViewController : MonoBehaviour
     private void Start()
     {
         playerRigidbody = GetComponent<Rigidbody>();
+        inventory = GetComponent<Inventory>();
     }
     
-    public void MouseLook(Vector2 mouseInput)
-    {
-        transform.localRotation *= Quaternion.Euler(0f, mouseInput.y * mouseSensetivity * Time.deltaTime, 0f);
-        camera.transform.localRotation *= Quaternion.Euler(-mouseInput.x * mouseSensetivity * Time.deltaTime, 0f,0f);
-
-        camera.transform.localRotation = ClampRotationAroundXAxis(camera.transform.localRotation);
-    }
-
     private void Update()
     {
         if (isActive)
-        {
-            MouseLook(MouseInput);
+        {   
+            if(!mouseLock)
+                MouseLook(MouseInput);
             if (Input.GetButtonDown("Jump"))
                 Jump();
         }
@@ -88,9 +86,9 @@ public class FirstPersonViewController : MonoBehaviour
             {
                 UpdateCurrentSpeed(KeyInput);
                 Vector3 moveAmount = ((transform.forward * KeyInput.y) + (transform.right * KeyInput.x)) *
-                                     currentSpeed * Time.fixedDeltaTime;
+                                     _currentSpeed * Time.fixedDeltaTime;
 
-                float normalisedSlope = (slopeAngle / 90f) * -1f;
+                float normalisedSlope = (_slopeAngle / 90f) * -1f;
                 debugText2.text = normalisedSlope.ToString();
 
                 moveAmount += (moveAmount * normalisedSlope);
@@ -101,51 +99,70 @@ public class FirstPersonViewController : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        ItemWorld itemWorld = other.GetComponent<ItemWorld>();
+
+        if (itemWorld != null)
+        {
+            GameEvents.current.AddItemInInventory(itemWorld.GetItem());
+            itemWorld.DestroySelf();
+        }
+    }
+
+    public void MouseLook(Vector2 mouseInput)
+    {
+        transform.localRotation *= Quaternion.Euler(0f, mouseInput.y * mouseSensetivity * Time.deltaTime, 0f);
+        camera.transform.localRotation *= Quaternion.Euler(-mouseInput.x * mouseSensetivity * Time.deltaTime, 0f,0f);
+
+        camera.transform.localRotation = ClampRotationAroundXAxis(camera.transform.localRotation);
+    }
+    
     public void GroundCheck()
     {
         RaycastHit hitInfo;
         if (Physics.Raycast(transform.position, Vector3.down,out hitInfo, 1.5f, groundMask))
         {
-            slopeAngle = (Vector3.Angle(hitInfo.normal, transform.forward) - 90);
+            _slopeAngle = (Vector3.Angle(hitInfo.normal, transform.forward) - 90);
 
             debugText.text = "Grounded on " + hitInfo.transform.name;
-            debugText.text += "\nSlope Angle: " + slopeAngle.ToString("N0") + "°";
-            isGrounded = true;
+            debugText.text += "\nSlope Angle: " + _slopeAngle.ToString("N0") + "°";
+            _isGrounded = true;
         }
         else
         {
             debugText.text = "Not Grounded";
-            isGrounded = false;
+            _isGrounded = false;
         }
     }
 
     private void UpdateCurrentSpeed(Vector2 input)
     {
-        if (!isGrounded)
+        if (!_isGrounded)
         {
-            currentSpeed = inAirSpeed;
+            _currentSpeed = inAirSpeed;
             return;
         }
 
         if (Input.GetButton("Sprint"))
         {
-            currentSpeed = runSpeed;
+            _currentSpeed = runSpeed;
             return;
         }
         
         if (input.y > 0)
         {
-            currentSpeed = walkSpeed;
+            _currentSpeed = walkSpeed;
         }
 
         if (input.y < 0)
         {
-            currentSpeed = backwardSpeed;
+            _currentSpeed = backwardSpeed;
         }
 
         if (input.x > 0 || input.x < 0)
         {
-            currentSpeed = strafeSpeed;
+            _currentSpeed = strafeSpeed;
         }
 
     }
@@ -158,7 +175,7 @@ public class FirstPersonViewController : MonoBehaviour
 
     public void Jump()
     {
-        if(isGrounded)
+        if(_isGrounded)
             playerRigidbody.AddForce((transform.up) * jumpForce, ForceMode.Impulse);
     }
     
@@ -171,7 +188,7 @@ public class FirstPersonViewController : MonoBehaviour
 
         float angleX = 2.0f * Mathf.Rad2Deg * Mathf.Atan (q.x);
 
-        angleX = Mathf.Clamp (angleX, lookMinX, lookMaxX);
+        angleX = Mathf.Clamp (angleX, _lookMinX, _lookMaxX);
 
         q.x = Mathf.Tan (0.5f * Mathf.Deg2Rad * angleX);
 

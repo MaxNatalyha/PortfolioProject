@@ -22,6 +22,11 @@ public class IslandGenerator : MonoBehaviour
     private Transform waterChunksHolder;
     private Transform islandChunksHolder;
 
+    private void Awake()
+    {
+        InventoryAssets.LoadResoursec();
+    }
+
     private void Start()
     {
         if(islandPreview!=null)

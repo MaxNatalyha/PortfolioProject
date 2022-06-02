@@ -20,17 +20,14 @@ public class ControllerManager : MonoBehaviour
     [Header("Controller Ref")]
     public FirstPersonViewController firstPersonViewController;
     public VehicleController vehicleController;
-    public UiNotification notification;
 
-    private float interactRadius = 2f;
-    private bool inCar;
+    private float _interactRadius = 2f;
+    private bool _inCar;
 
-    public Item item;
-    
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        
+        Cursor.lockState = CursorLockMode.Confined;
+
         controllerType = ControllerType.Character;
         
         SetControll();
@@ -44,28 +41,38 @@ public class ControllerManager : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.E))
-            HUDEvents.current.OpenInventory();
-        
-        if (CalculateDstCharToCar() < interactRadius && !inCar)
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
-            notification.ShowCarSeatNotification("Press F to pay respect");
-        }
-        else
-        {
-            notification.HideCarSeatNotification();
+            GameEvents.current.OpenInventory();
+            firstPersonViewController.mouseLock = !firstPersonViewController.mouseLock;
         }
 
+        if (CalculateDstCharToCar() < _interactRadius && !_inCar)
+        {
+            GameEvents.current.ShowNotification("Press E to pay respect");
+        }
+
+        
+        
         if (Input.GetKeyDown(KeyCode.G))
         {
-            item.count = 150;
-            HUDEvents.current.onAddingItem?.Invoke(item);
+            Item wood = new Item(ItemTypes.Wood, 250, true);
+            GameEvents.current.AddItemInInventory?.Invoke(wood);
         }
-
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            Item stone = new Item(ItemTypes.Stone, 250, true);
+            GameEvents.current.AddItemInInventory?.Invoke(stone);
+        }        
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            GameEvents.current.RemoveLastItemFromInventory?.Invoke();
+        }    
+        
         if (Input.GetKey(KeyCode.Escape) && !Application.isEditor)
             Application.Quit();
 
-        if (Input.GetKeyDown(KeyCode.F) && CalculateDstCharToCar() < interactRadius)
+        if (Input.GetKeyDown(KeyCode.E) && CalculateDstCharToCar() < _interactRadius)
         {
             if (controllerType == ControllerType.Character)
                 controllerType = ControllerType.Vehicle;
@@ -127,7 +134,7 @@ public class ControllerManager : MonoBehaviour
         firstPersonViewController.transform.localPosition = vehicleController.seatPosition.localPosition;
         firstPersonViewController.transform.rotation = vehicleController.seatPosition.rotation;
         
-        inCar = true;
+        _inCar = true;
     }
 
     private void ExitFromCar()
@@ -137,7 +144,7 @@ public class ControllerManager : MonoBehaviour
         firstPersonViewController.GetComponent<Rigidbody>().isKinematic = false;
         firstPersonViewController.GetComponent<Collider>().enabled = true;
 
-        inCar = false;
+        _inCar = false;
     }
 
     

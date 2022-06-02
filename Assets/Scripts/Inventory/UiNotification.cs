@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,14 +9,23 @@ public class UiNotification : MonoBehaviour
     public RectTransform notifTrans;
     public Text notifText;
 
-    public void ShowCarSeatNotification(string text)
+    private void Start()
+    {
+        GameEvents.current.ShowNotification += ShowNotification;
+    }
+
+    private void ShowNotification(string text)
     {
         notifTrans.gameObject.SetActive(true);
         notifText.text = text;
+
+        StartCoroutine(HideNotification());
     }
     
-    public void HideCarSeatNotification()
+    private IEnumerator HideNotification()
     {
+        yield return new WaitForSeconds(.5f);
+        
         notifTrans.gameObject.SetActive(false);
     }
 }

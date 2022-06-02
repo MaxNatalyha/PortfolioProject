@@ -12,7 +12,7 @@ public class HUD : MonoBehaviour
 
     private void Start()
     {
-        HUDEvents.current.onOpenInventory += openInventory;
+        GameEvents.current.onOpenInventory += openInventory;
     }
 
     public void openInventory()
